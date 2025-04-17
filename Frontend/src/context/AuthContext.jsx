@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
-import { loginUser as loginService } from "../services/authApi";
-import {getToken, setToken, clearToken} from "../utils/tokenUtils";
+import { loginUser as loginService } from "../services/authApi.js";
+import {getToken, setToken, clearToken} from "../utils/tokenUtils.js";
 
 export const AuthContext = createContext();
 
