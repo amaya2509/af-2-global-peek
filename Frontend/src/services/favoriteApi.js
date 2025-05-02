@@ -1,21 +1,43 @@
-import axios from "axios";
-import { getToken } from "../utils/tokenUtils";
+import axios from 'axios';
+import { getToken } from '../utils/tokenUtils';
 
-const authHeader = () => ({
-    headers: {Authorization: `Bearer ${getToken()}`},
-});
+const API_URL = 'http://localhost:5000/api/users/favorites';
 
-export const getFavorites = async () => {
-    const res = await axios.get('/api/user/favorites', authHeader());
-    return res.data;
+export const addFavorite = async (countryCode) => {
+  const token = getToken();
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const res = await axios.post(API_URL, { countryCode }, config);
+  return res.data;
 };
 
-export const addFavorite = async (cca3) => {
-    const res = await axios.post('/api/user/favorites', {cca3}, authHeader());
-    return res.data;
-}
+export const removeFavorite = async (countryCode) => {
+  const token = getToken();
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
-export const removeFavorite = async (cca3) => {
-    const res = await axios.delete('/api/user/favorites', {data: {cca3}, ...authHeader()});
-    return res.data;
+  const res = await axios.delete(API_URL, {
+    data: { countryCode },
+    ...config,
+  });
+  return res.data;
+};
+
+export const getFavorites = async () => {
+  const token = getToken();
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const res = await axios.get(API_URL, config);
+  return res.data;
 };
