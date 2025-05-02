@@ -10,12 +10,13 @@ import { FavoriteProvider } from './context/FavoriteContext.jsx'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <StrictMode>
   <BrowserRouter>
-    <FavoriteProvider> 
-      <AuthProvider>
+    <AuthProvider>
+      <FavoriteProvider> 
         <App />
-      </AuthProvider>
-    </FavoriteProvider>
+      </FavoriteProvider>
+    </AuthProvider>
   </BrowserRouter>
 </StrictMode>
+
 
 )
