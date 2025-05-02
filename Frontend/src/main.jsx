@@ -5,13 +5,17 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { FavoriteProvider } from './context/FavoriteContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter> {/* ✅ Add this */}
+  <BrowserRouter>
+    <FavoriteProvider> 
       <AuthProvider>
         <App />
       </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>
+    </FavoriteProvider>
+  </BrowserRouter>
+</StrictMode>
+
 )

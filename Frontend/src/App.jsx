@@ -1,8 +1,14 @@
 import React from 'react'
+import AppRoutes from './routes/AppRoutes';
+import Navbar from './components/Navbar';
+// import { BrowserRouter as Router } from 'react-router-dom';
 
 const App = () => {
   return (
-    <div className='font-bold'>App</div>
+    <>
+      <Navbar />
+      <AppRoutes />
+    </>
   )
 }
 
