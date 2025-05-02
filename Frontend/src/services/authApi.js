@@ -16,3 +16,18 @@ export const loginUser = async ({ email, password }) => {
 
   return res.json(); // Expected response: { token, user }
 };
+
+export const registerUser = async ({ name, email, password }) => {
+  const res = await fetch(`${API_BASE}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Registration failed');
+  }
+
+  return res.json(); 
+};
