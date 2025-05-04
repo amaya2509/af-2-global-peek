@@ -1,9 +1,11 @@
 // src/pages/Login.jsx
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate(); // ✅ initialize navigate
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
@@ -16,6 +18,7 @@ const Login = () => {
     setError('');
     try {
       await login(form.email, form.password);
+      navigate('/'); // ✅ redirect to home on success
     } catch (err) {
       setError(err.message);
     }
