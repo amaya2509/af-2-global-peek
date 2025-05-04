@@ -1,48 +1,43 @@
-import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser as loginService } from "../services/authApi.js";
-import { getToken, setToken, clearToken } from "../utils/tokenUtils.js";
+import { createContext, useEffect, useState } from 'react';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
+import { auth } from '../firebase.js';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // ⬅️ Add this
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) setUser(storedUser);
-    }
-    setLoading(false); // ⬅️ Done loading
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email, password) => {
-    try {
-      const { token, user: userData } = await loginService({ email, password });
-      setToken(token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      navigate('/');
-    } catch (error) {
-      console.error("Login failed:", error.message);
-      throw error;
-    }
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logout = () => {
-    clearToken();
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/login');
+  const register = async (email, password) => {
+    await createUserWithEmailAndPassword(auth, email, password);
   };
 
-  if (loading) return null; // ⬅️ Prevent rendering routes until auth is ready
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+  if (loading) return null;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

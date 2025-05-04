@@ -1,52 +1,60 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { getFavorites, addFavorite, removeFavorite } from "../services/favoriteApi.js";
+// src/context/FavoriteContext.jsx
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { db } from '../firebase.js';
+import { AuthContext } from './AuthContext';
 
 const FavoriteContext = createContext();
 
 export const useFavorites = () => useContext(FavoriteContext);
 
 export const FavoriteProvider = ({ children }) => {
-  const [favorites, setFavorites] = useState([]);       // stores array of codes like ['USA', 'LKA']
-  const [favoritesLoaded, setFavoritesLoaded] = useState(false); // new flag to signal when loading is done
+  const { user } = useContext(AuthContext);
+  const [favorites, setFavorites] = useState([]);
+  const [favoritesLoaded, setFavoritesLoaded] = useState(false);
 
   const loadFavorites = async () => {
-    try {
-      const data = await getFavorites();
-const codes = Array.isArray(data)
-  ? data
-  : Array.isArray(data.favorites)
-    ? data.favorites
-    : [];
-
+    if (!user) return;
   
-      setFavorites(codes);
-    } catch (error) {
-      console.error("Error loading favorites:", error);
-    } finally {
-      setFavoritesLoaded(true);
+    const docRef = doc(db, 'favorites', user.uid);
+    const docSnap = await getDoc(docRef);
+  
+    if (docSnap.exists()) {
+      setFavorites(docSnap.data().codes || []);
+    } else {
+      await setDoc(docRef, { codes: [] });
+      setFavorites([]);
     }
+  
+    setFavoritesLoaded(true);
   };
   
 
   const toggleFavorite = async (country) => {
-    try {
-      const code = country.cca3;
+    if (!user) return;
+    const code = country.cca3;
+    const docRef = doc(db, 'favorites', user.uid);
 
+    try {
       if (favorites.includes(code)) {
-        await removeFavorite(code);
+        await updateDoc(docRef, {
+          codes: arrayRemove(code),
+        });
         setFavorites((prev) => prev.filter((c) => c !== code));
       } else {
-        await addFavorite(code);
+        await updateDoc(docRef, {
+          codes: arrayUnion(code),
+        });
         setFavorites((prev) => [...prev, code]);
       }
     } catch (error) {
-      console.error("Error toggling favorite:", error);
+      console.error('Error toggling favorite:', error);
     }
   };
 
   useEffect(() => {
-    loadFavorites();
-  }, []);
+    if (user) loadFavorites();
+  }, [user]);
 
   return (
     <FavoriteContext.Provider value={{ favorites, toggleFavorite, favoritesLoaded }}>
