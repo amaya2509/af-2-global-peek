@@ -8,7 +8,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      <Link to="/" className="text-xl font-bold text-blue-600">GlobalPeek</Link>
+      <Link to="/" className="text-xl font-extrabold text-green-800">GLOBALPEEK</Link>
       <div className="space-x-4">
         <Link to="/" className="hover:underline">Home</Link>
         {user && <Link to="/favorites" className="hover:underline">Favorites</Link>}
