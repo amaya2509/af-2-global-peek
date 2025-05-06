@@ -3,9 +3,11 @@ import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home.jsx';
 import Login from '../pages/Login.jsx';
 import Register from '../pages/Register.jsx';
-import CountryDetails from '../pages/CountryDetails.jsx';
+import CountryPage from '../pages/CountryPage.jsx';
 import Favorites from '../pages/Favorites.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
+import Continents from '../pages/Continents';
+import ContinentCountries from '../pages/ContinentCountries';
 
 const AppRoutes = () => {
   return(
@@ -13,7 +15,9 @@ const AppRoutes = () => {
     <Route path='/' element={<Home />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
-    <Route path='/country/:code' element={<CountryDetails />} />
+    <Route path='/country/:code' element={<CountryPage />} />
+    <Route path="/continents" element={<Continents />} />
+    <Route path="/continents/:continentName" element={<ContinentCountries />} />
     
     {/* Protected Route */}
     <Route
