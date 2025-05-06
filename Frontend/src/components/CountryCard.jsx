@@ -7,8 +7,8 @@ const CountryCard = ({ country, onClick }) => {
   const isFavorite = Array.isArray(favorites) && favorites.some((fav) => fav === country.cca3);
 
   const handleFavoriteClick = (e) => {
-    e.preventDefault(); 
-    e.stopPropagation(); 
+    e.preventDefault();
+    e.stopPropagation();
     toggleFavorite(country);
   };
 
@@ -19,25 +19,21 @@ const CountryCard = ({ country, onClick }) => {
         className="no-underline"
         onClick={() => onClick && onClick(country)}
       >
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer">
+        <div className="bg-white/20 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-xl rounded-xl overflow-hidden transition-transform transform hover:scale-[1.03] hover:shadow-2xl duration-300">
           <img
             src={country.flags?.svg || country.flags?.png}
             alt={`${country.name.common} flag`}
-            className="w-full h-40 object-cover"
+            className="w-full h-48 object-cover"
           />
           <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 tracking-wide">
               {country.name.common}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              <strong>Capital:</strong> {country.capital?.[0] || 'N/A'}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              <strong>Region:</strong> {country.region}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              <strong>Population:</strong> {country.population.toLocaleString()}
-            </p>
+            <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+              <li><strong>Capital:</strong> {country.capital?.[0] || 'N/A'}</li>
+              <li><strong>Region:</strong> {country.region}</li>
+              <li><strong>Population:</strong> {country.population.toLocaleString()}</li>
+            </ul>
           </div>
         </div>
       </Link>
@@ -46,7 +42,7 @@ const CountryCard = ({ country, onClick }) => {
       <button
         onClick={handleFavoriteClick}
         title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        className="absolute top-3 right-3 text-xl bg-white bg-opacity-70 rounded-full p-1 hover:scale-110 transition"
+        className="absolute top-3 right-3 text-xl bg-white/80 dark:bg-gray-900/70 text-red-500 dark:text-white rounded-full p-2 hover:scale-110 transition-transform shadow-md"
       >
         {isFavorite ? '❤️' : '🤍'}
       </button>
