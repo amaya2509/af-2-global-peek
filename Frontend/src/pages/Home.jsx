@@ -1,13 +1,19 @@
 // src/pages/Home.jsx
-import { useEffect, useState } from 'react';
-import Hero from '../components/Hero';
-import CountryCard from '../components/CountryCard';
-import { getAllCountries, getCountriesByRegion, getCountryByName } from '../services/countriesApi';
+import { useEffect, useState } from "react";
+import Hero from "../components/Hero";
+import CountryCard from "../components/CountryCard";
+import {
+  getAllCountries,
+  getCountriesByRegion,
+  getCountryByName,
+} from "../services/countriesApi";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Home = () => {
   const [countries, setCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [region, setRegion] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [region, setRegion] = useState("");
+  const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
     fetchCountries();
@@ -15,29 +21,54 @@ const Home = () => {
 
   const fetchCountries = async () => {
     try {
+      let res = [];
       if (searchTerm) {
-        const res = await getCountryByName(searchTerm);
-        setCountries(res);
+        res = await getCountryByName(searchTerm);
       } else if (region) {
-        const res = await getCountriesByRegion(region);
-        setCountries(res);
+        res = await getCountriesByRegion(region);
       } else {
-        const res = await getAllCountries();
-        setCountries(res);
+        res = await getAllCountries();
       }
+      setCountries(res);
+      setVisibleCount(20); // reset pagination on new search/filter
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleViewMore = () => {
+    setVisibleCount((prev) => prev + 20);
   };
 
   return (
     <div>
       <Hero onSearch={setSearchTerm} onFilter={setRegion} />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6">
-        {countries.map((country) => (
-          <CountryCard key={country.cca3} country={country} />
-        ))}
+        <AnimatePresence>
+          {countries.slice(0, visibleCount).map((country) => (
+            <motion.div
+              key={country.cca3}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CountryCard country={country} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
+
+      {visibleCount < countries.length && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={handleViewMore}
+            className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+          >
+            View More
+          </button>
+        </div>
+      )}
     </div>
   );
 };
