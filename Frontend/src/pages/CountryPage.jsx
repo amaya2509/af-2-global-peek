@@ -1,6 +1,8 @@
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import CountryDetails from '../components/CountryDetails';
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import CountryDetails from "../components/CountryDetails";
+import { getCountryByCode } from "../services/countriesApi";
+import Loader from "../components/Loader";
 
 const CountryPage = () => {
   const { code } = useParams();
@@ -9,24 +11,27 @@ const CountryPage = () => {
 
   useEffect(() => {
     const fetchCountry = async () => {
-      setLoading(true);
-      const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
-      const data = await res.json();
-      setCountry(data[0]); // Make sure data[0] is used
-      setLoading(false);
+      try {
+        const data = await getCountryByCode(code);
+        setCountry(data);
+      } catch (error) {
+        console.error("Error fetching country data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchCountry();
   }, [code]);
 
   return (
-    <>
+    <main className="min-h-screen backdrop-blur-md text-white">
       {loading ? (
-        <p className="text-center mt-10 text-gray-500">Loading...</p>
+        <Loader />
       ) : (
-        <CountryDetails country={country} />
+        country && <CountryDetails country={country} />
       )}
-    </>
+    </main>
   );
 };
 

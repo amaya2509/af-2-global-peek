@@ -1,7 +1,7 @@
-'use client';
-import React, { useEffect, useRef } from 'react';
-import createGlobe from 'cobe';
-import { cn } from '../lib/utils';
+"use client";
+import React, { useEffect, useRef } from "react";
+import createGlobe from "cobe";
+import { cn } from "../lib/utils";
 
 const Earth = ({
   className,
@@ -20,7 +20,7 @@ const Earth = ({
     let width = 0;
     const onResize = () =>
       canvasRef.current && (width = canvasRef.current.offsetWidth);
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
     onResize();
     let phi = 0;
     onResize();
@@ -50,23 +50,25 @@ const Earth = ({
       globe.destroy();
     };
   }, []);
+
   return (
     <div
       className={cn(
-        'flex items-center justify-center z-[10] w-full max-w-[350px] mx-auto',
+        "flex items-center justify-center z-[10] w-full max-w-[350px] mx-auto px-5 pt-5 md:px-0 md:pt-0",
         className
       )}
     >
       <canvas
         ref={canvasRef}
         style={{
-          width: '100%',
-          height: '100%',
-          maxWidth: '100%',
-          aspectRatio: '1',
+          width: "100%",
+          height: "100%",
+          maxWidth: "100%",
+          aspectRatio: "1",
         }}
       />
     </div>
   );
 };
+
 export default Earth;

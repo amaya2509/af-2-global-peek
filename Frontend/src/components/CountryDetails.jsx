@@ -1,108 +1,172 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import {Link } from 'react-router-dom';
+import { getCountryByCode, getCountryByName, fetchRelatedCountries } from '../services/countriesApi';
 
-const CountryDetails = ({ country }) => {
-  if (!country) {
+const CountryDetails = ({country}) => {
+  
+  const [relatedCountries, setRelatedCountries] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      if (country?.name?.common) {
+        try {
+          const relatedCountries = await fetchRelatedCountries(country.name.common);
+          setRelatedCountries(relatedCountries);
+        } catch (err) {
+          console.error("Failed to fetch related countries", err);
+        }
+      }
+    };
+  
+    fetchRelated();
+  }, [country]);
+  
+
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex justify-center items-center bg-gradient-to-b from-blue-900 to-blue-700">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-yellow-400"></div>
+  //     </div>
+  //   );
+  // }
+
+  if (error || !country) {
     return (
-      <div className="animate-pulse text-center p-8 text-gray-500 dark:text-gray-400">
-        <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mx-auto mb-4" />
-        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/3 mx-auto" />
-        <p>Loading country details...</p>
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 flex flex-col items-center justify-center text-white p-6">
+        <h1 className="text-2xl font-bold">Error</h1>
+        <p>{error}</p>
+        <Link to="/" className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full">
+          Back Home
+        </Link>
       </div>
     );
   }
 
-  const {
-    name,
-    flags,
-    capital,
-    region,
-    subregion,
-    population,
-    area,
-    timezones,
-    currencies,
-    languages,
-    borders,
-    tld,
-    maps,
-    unMember,
-    startOfWeek,
-  } = country;
-
   return (
-    <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-8 rounded-2xl shadow-lg max-w-6xl mx-auto mt-10 transition-all">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row gap-10 items-center">
-        <img
-          src={flags?.svg || flags?.png}
-          alt={`${name.common} flag`}
-          className="w-full md:w-1/2 h-auto rounded-xl shadow-lg border dark:border-gray-700"
-        />
-        <div className="flex-1">
-          <h1 className="text-4xl font-extrabold mb-2">{name.common}</h1>
-          <h2 className="text-xl text-gray-600 dark:text-gray-300 italic mb-4">
-            {name.official}
-          </h2>
+    <div className="min-h-screen text-white">
+      {/* Navbar */}
+      {/* <nav className="bg-blue-800/50 backdrop-blur-sm p-4 sticky top-0 z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link to="/" className="text-white text-xl font-bold">World Explorer</Link>
+          <Link to="/" className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-4 py-1 rounded-full text-sm">
+            Back to Countries
+          </Link>
+        </div>
+      </nav> */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <p><strong>Capital:</strong> {capital?.[0] || 'N/A'}</p>
-            <p><strong>Region:</strong> {region} / {subregion}</p>
-            <p><strong>Population:</strong> {population.toLocaleString()}</p>
-            <p><strong>Area:</strong> {area.toLocaleString()} km²</p>
-            <p><strong>Start of Week:</strong> {startOfWeek}</p>
-            <p><strong>UN Member:</strong> {unMember ? '✅ Yes' : '❌ No'}</p>
-            <p><strong>Timezones:</strong> {timezones?.join(', ')}</p>
-            <p><strong>Top Level Domain:</strong> {tld?.join(', ')}</p>
+      {/* Flag Banner */}
+      <div className="mx-auto max-w-md flex flex-col items-center gap-4 py-6">
+  <div className="h-32 md:h-40 flex items-center justify-center overflow-hidden rounded-lg shadow-md bg-white/10">
+    <img
+      src={country.flags?.png || country.flags?.svg}
+      alt={`Flag of ${country.name?.common}`}
+      className="max-h-full object-contain"
+    />
+  </div>
+  <div className="text-center">
+    <h1 className="text-3xl font-bold">{country.name?.common}</h1>
+    <p className="text-white/70">{country.name?.official}</p>
+  </div>
+</div>
+
+
+
+      {/* Country Info */}
+      <div className="container mx-auto px-4 md:px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Side */}
+        <div className="space-y-6">
+          {/* Basic Info */}
+          <div className="bg-white/20 backdrop-blur-sm p-6 rounded-xl">
+            <h2 className="text-xl font-bold border-b border-white/30 pb-2 mb-4">Basic Info</h2>
+            <ul className="space-y-2">
+              <li>🏙️ <strong>Capital:</strong> {country.capital?.join(', ') || 'N/A'}</li>
+              <li>🌍 <strong>Region:</strong> {country.region} {country.subregion ? `(${country.subregion})` : ''}</li>
+              <li>👨‍👩‍👧‍👦 <strong>Population:</strong> {country.population?.toLocaleString()}</li>
+              <li>📏 <strong>Area:</strong> {country.area?.toLocaleString()} km²</li>
+            </ul>
+          </div>
+
+          {/* Languages & Currency */}
+          <div className="bg-white/20 backdrop-blur-sm p-6 rounded-xl">
+            <h2 className="text-xl font-bold border-b border-white/30 pb-2 mb-4">Languages & Currency</h2>
+            <p><strong>Languages:</strong></p>
+            <div className="flex flex-wrap gap-2">
+              {country.languages ? Object.values(country.languages).map((lang, i) => (
+                <span key={i} className="bg-blue-600/50 px-3 py-1 rounded-full text-sm">{lang}</span>
+              )) : "N/A"}
+            </div>
+            <p className="mt-4"><strong>Currencies:</strong></p>
+            <div className="flex flex-wrap gap-2">
+              {country.currencies ? Object.entries(country.currencies).map(([code, { name, symbol }]) => (
+                <span key={code} className="bg-green-600/50 px-3 py-1 rounded-full text-sm">
+                  {name} ({symbol || code})
+                </span>
+              )) : "N/A"}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side */}
+        <div className="space-y-6">
+          {/* Fun Facts */}
+          <div className="bg-yellow-100 text-blue-900 p-6 rounded-xl border-2 border-yellow-300">
+            <h2 className="text-xl font-bold mb-4">✨ Fun Facts</h2>
+            <ul className="space-y-2">
+              <li>📌 {country.name?.common} is located in {country.region}{country.subregion && ` (${country.subregion})`}.</li>
+              {country.independent !== undefined && (
+                <li>{country.independent ? '🎉 Independent country' : '🤝 Not independent'}</li>
+              )}
+              {country.unMember && <li>🇺🇳 UN Member</li>}
+              {country.borders?.length === 0 && <li>🏝️ Island nation (no land borders)</li>}
+            </ul>
+          </div>
+
+          {/* Borders */}
+          <div className="bg-white/20 backdrop-blur-sm p-6 rounded-xl">
+            <h2 className="text-xl font-bold mb-3">Neighboring Countries</h2>
+            {country.borders?.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {country.borders.map(border => (
+                  <Link key={border} to={`/country/${border}`} className="bg-white/30 px-3 py-1 rounded-lg hover:bg-white/40 text-sm">
+                    {border}
+                  </Link>
+                ))}
+              </div>
+            ) : <p>No land borders</p>}
+          </div>
+
+          {/* Greetings */}
+          <div className="bg-white/20 backdrop-blur-sm p-6 rounded-xl">
+            <h2 className="text-xl font-bold mb-3">Say Hello!</h2>
+            {country.languages ? (
+              Object.entries(country.languages).map(([code, language]) => {
+                const greetings = {
+                  eng: "Hello!", spa: "¡Hola!", fra: "Bonjour!", deu: "Hallo!", ita: "Ciao!",
+                  por: "Olá!", rus: "Привет!", jpn: "こんにちは!", kor: "안녕하세요!",
+                  zho: "你好!", ara: "مرحبا!", hin: "नमस्ते!", sqi: "Përshëndetje!"
+                };
+                return (
+                  <p key={code}><strong>{language}:</strong> {greetings[code] || 'Hello!'}</p>
+                );
+              })
+            ) : <p>No greeting available</p>}
           </div>
         </div>
       </div>
 
-      {/* Languages */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-1">Languages</h3>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          {languages ? Object.values(languages).join(', ') : 'N/A'}
-        </p>
-      </div>
-
-      {/* Currencies */}
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-1">Currencies</h3>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          {currencies
-            ? Object.values(currencies).map((cur) => `${cur.name} (${cur.symbol})`).join(', ')
-            : 'N/A'}
-        </p>
-      </div>
-
-      {/* Borders */}
-      {borders?.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Bordering Countries</h3>
-          <div className="flex flex-wrap gap-2">
-            {borders.map((code) => (
-              <span
-                key={code}
-                className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-medium shadow"
-              >
-                {code}
-              </span>
+      {/* Related Countries */}
+      {relatedCountries.length > 0 && (
+        <div className="container mx-auto px-4 py-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Explore More Countries</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {relatedCountries.map((c) => (
+              <Link key={c.cca3} to={`/country/${c.cca3}`} className="bg-white/10 hover:bg-white/20 p-4 rounded-xl text-center">
+                <img src={c.flags?.png} alt={c.name.common} className="w-full h-24 object-cover rounded-md mb-2" />
+                <h3 className="text-white font-bold">{c.name.common}</h3>
+              </Link>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Map */}
-      {maps?.googleMaps && (
-        <div className="mt-6">
-          <a
-            href={maps.googleMaps}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline text-sm"
-          >
-            🌍 View on Google Maps
-          </a>
         </div>
       )}
     </div>
