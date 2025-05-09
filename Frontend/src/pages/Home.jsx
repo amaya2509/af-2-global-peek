@@ -14,6 +14,7 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [region, setRegion] = useState("");
   const [visibleCount, setVisibleCount] = useState(20);
+  const [error, setError] = useState(null); // Ensure error state is defined
 
   useEffect(() => {
     fetchCountries();
@@ -29,10 +30,14 @@ const Home = () => {
       } else {
         res = await getAllCountries();
       }
+      console.log("API Response:", res); 
       setCountries(res);
       setVisibleCount(20); // reset pagination on new search/filter
+      setError(null);
     } catch (err) {
-      console.error(err);
+      console.error("Error in fetching countries:", err); 
+      setError("Error loading countries");
+      setCountries([]);
     }
   };
 
@@ -43,6 +48,14 @@ const Home = () => {
   return (
     <div>
       <Hero onSearch={setSearchTerm} onFilter={setRegion} />
+
+      {/* Error Message */}
+      {error && (
+        <p className="text-red-500 text-center mt-4" data-testid="error-message">
+          {error}
+        </p>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6">
         <AnimatePresence>
           {countries.slice(0, visibleCount).map((country) => (
