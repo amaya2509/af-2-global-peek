@@ -25,9 +25,9 @@ cd Frontend
 ```bash
 npm install
 
-### 3. se up Firebase
+### 3. set up Firebase
 
-Create a firebase project in te Firebase Console.
+Create a firebase project in the Firebase Console.
 Add a web app to your Firebase project and copy the Firebase configuration in stc/firebase.js
 
 ### 4. Run the development server
