@@ -10,4 +10,9 @@ export default defineConfig({
     tailwindcss(),
     glsl()
   ],
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: './src/__tests__/setup.js',
+  }
 });
